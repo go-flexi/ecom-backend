@@ -6,15 +6,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-flexi/ecom-backend/pkg/web"
+	"github.com/go-flexi/ecom-backend/pkg/web/server"
 	"go.uber.org/zap"
 )
 
 // Logger logs the request and response
-func Logger(logger *zap.Logger) web.Middleware {
-	return func(next web.Handler) web.Handler {
+func Logger(logger *zap.Logger) server.Middleware {
+	return func(next server.Handler) server.Handler {
 		return func(ctx context.Context, w http.ResponseWriter, r *http.Request) (err error) {
-			v := web.GetValues(ctx)
+			v := server.GetValues(ctx)
 
 			path := r.URL.Path
 			if r.URL.RawQuery != "" {

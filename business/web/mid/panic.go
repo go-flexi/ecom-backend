@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/go-flexi/ecom-backend/pkg/web"
+	"github.com/go-flexi/ecom-backend/pkg/web/server"
 )
 
 // Panic recovers from panics and logs the error
-func Panic() web.Middleware {
-	return func(next web.Handler) web.Handler {
+func Panic() server.Middleware {
+	return func(next server.Handler) server.Handler {
 		return func(ctx context.Context, w http.ResponseWriter, r *http.Request) (err error) {
 			defer func() {
 				if rec := recover(); rec != nil {

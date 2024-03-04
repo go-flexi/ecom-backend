@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi"
-	"github.com/go-flexi/ecom-backend/business/core/filter"
+	"github.com/go-flexi/ecom-backend/pkg/filter"
 	"github.com/go-flexi/ecom-backend/pkg/validate"
 )
 

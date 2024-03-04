@@ -1,4 +1,4 @@
-package web
+package server
 
 // Route is a struct that represents a route
 type Route struct {
