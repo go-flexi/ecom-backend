@@ -7,14 +7,16 @@ var ErrInvalidRole = errors.New("invalid role")
 
 // list of role
 const (
-	admin = "admin"
-	user  = "user"
+	admin   = "admin"
+	manager = "manager"
+	user    = "user"
 )
 
 // set of knwon roles
 var roles = map[string]Role{
-	admin: RoleAdmin(),
-	user:  RoleUser(),
+	admin:   RoleAdmin(),
+	user:    RoleUser(),
+	manager: RoleManager(),
 }
 
 // Role represents a user role
@@ -29,6 +31,9 @@ func (r Role) Equal(r2 Role) bool { return r.name == r2.name }
 
 // RoleAdmin returns the admin role
 func RoleAdmin() Role { return Role{name: admin} }
+
+// RoleManager returns the manager role
+func RoleManager() Role { return Role{name: manager} }
 
 // RoleUser returns the user role
 func RoleUser() Role { return Role{name: user} }
