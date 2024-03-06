@@ -23,7 +23,7 @@ type User struct {
 	Name         string
 	Email        mail.Address
 	PasswordHash []byte
-	Roles        []Role
+	Roles        Roles
 	Enabled      bool
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
@@ -31,9 +31,11 @@ type User struct {
 
 // UpdateUser represents the fields that can be updated
 type UpdateUser struct {
-	Name    *string
-	Roles   []Role
-	Enabled *bool
+	ID       uuid.UUID
+	Name     *string
+	Roles    []Role
+	Password *Password
+	Enabled  *bool
 }
 
 // NewUser is used to create a new user
@@ -41,7 +43,7 @@ type NewUser struct {
 	Name     string
 	Email    mail.Address
 	Password Password
-	Roles    []Role
+	Roles    Roles
 }
 
 // User converts the NewUser to a User
@@ -62,4 +64,12 @@ func (nu NewUser) User() (User, error) {
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}, nil
+}
+
+// Token is used to authenticate a user
+type Token struct {
+	ID       uuid.UUID
+	UserID   uuid.UUID
+	Roles    Roles
+	ExpireAt time.Time
 }

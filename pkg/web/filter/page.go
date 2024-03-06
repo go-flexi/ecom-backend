@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi"
+	"github.com/go-flexi/ecom-backend/pkg/apperrors"
 	"github.com/go-flexi/ecom-backend/pkg/filter"
-	"github.com/go-flexi/ecom-backend/pkg/validate"
 )
 
 // ParsePage parses the Page from the request
@@ -19,12 +19,12 @@ func ParsePage(r *http.Request) (filter.Page, error) {
 
 	page.Skip, err = strconv.Atoi(skip)
 	if err != nil {
-		return filter.Page{}, validate.NewFieldErrors("skip", err)
+		return filter.Page{}, apperrors.NewFieldErrors("skip", err)
 	}
 
 	page.Limit, err = strconv.Atoi(limit)
 	if err != nil {
-		return filter.Page{}, validate.NewFieldErrors("limit", err)
+		return filter.Page{}, apperrors.NewFieldErrors("limit", err)
 	}
 
 	return page, nil

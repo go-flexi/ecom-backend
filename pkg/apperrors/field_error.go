@@ -1,4 +1,4 @@
-package validate
+package apperrors
 
 import (
 	"encoding/json"
@@ -6,14 +6,14 @@ import (
 	"fmt"
 )
 
-// FieldError is used to represent a validation error for a specific field
-type FieldError struct {
+// Field is used to represent a validation error for a specific field
+type Field struct {
 	Field string `json:"field"`
 	Err   string `json:"error"`
 }
 
 // FieldErrors is a collection of FieldError
-type FieldErrors []FieldError
+type FieldErrors []Field
 
 // NewFieldErrors returns a FieldErrors with a single FieldError
 func NewFieldErrors(field string, err error) FieldErrors {
