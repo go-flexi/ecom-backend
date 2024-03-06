@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/go-flexi/ecom-backend/pkg/web"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -41,11 +42,11 @@ func (s *Server) AddRouter(route Route) {
 	}
 
 	s.router.Method(route.Method, route.Path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		v := Values{
+		v := web.Values{
 			TraceID: uuid.NewString(),
 			Now:     time.Now(),
 		}
-		ctx := setValues(r.Context(), &v)
+		ctx := web.SetValues(r.Context(), &v)
 
 		if err := handler(ctx, w, r); err != nil {
 			s.logger.Error("error handling request", zap.Error(err))

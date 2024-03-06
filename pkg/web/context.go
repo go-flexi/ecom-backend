@@ -1,4 +1,4 @@
-package server
+package web
 
 import (
 	"context"
@@ -28,13 +28,13 @@ func GetValues(ctx context.Context) *Values {
 	return v
 }
 
-// setStatusCode sets the status code in the context
-func setStausCode(ctx context.Context, code int) {
+// SetStatusCode sets the status code in the context
+func SetStausCode(ctx context.Context, code int) {
 	v := GetValues(ctx)
 	v.StatusCode = code
 }
 
-// setValues sets the values in the context
-func setValues(ctx context.Context, v *Values) context.Context {
+// SetValues sets the values in the context
+func SetValues(ctx context.Context, v *Values) context.Context {
 	return context.WithValue(ctx, key, v)
 }

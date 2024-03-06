@@ -1,4 +1,4 @@
-package server
+package web
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 
 // JSONResponse sends v as a JSON response to the client
 func JSONResponse(ctx context.Context, w http.ResponseWriter, v interface{}, code int) error {
-	setStausCode(ctx, code)
+	SetStausCode(ctx, code)
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(code)

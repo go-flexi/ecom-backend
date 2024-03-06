@@ -1,12 +1,8 @@
 package user
 
 import (
-	"errors"
 	"fmt"
 )
-
-// ErrInvalidRole is returned when an invalid role is used
-var ErrInvalidRole = errors.New("invalid role")
 
 // list of role
 const (
@@ -59,7 +55,7 @@ func RoleUser() Role { return Role{name: user} }
 func ParseRole(value string) (Role, error) {
 	role, ok := roles[value]
 	if !ok {
-		return Role{}, ErrInvalidRole
+		return Role{}, fmt.Errorf("invalid role %s", value)
 	}
 	return role, nil
 }
@@ -76,7 +72,7 @@ func ParseRoles(values []string) ([]Role, error) {
 
 		role, err := ParseRole(v)
 		if err != nil {
-			return nil, fmt.Errorf("parseRole[%s], %w", v, err)
+			return nil, err
 		}
 
 		roles = append(roles, role)

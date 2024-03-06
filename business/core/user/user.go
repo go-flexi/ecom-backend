@@ -13,7 +13,7 @@ import (
 
 // list of errors
 var (
-	ErrNotFound    = errors.New("user not found")
+	ErrNotFound    = errors.New("not found")
 	ErrUniqueEmail = errors.New("email already exists")
 )
 
@@ -149,8 +149,8 @@ func (c *Core) GenerateToken(ctx context.Context, email, password string) (Token
 	return token, nil
 }
 
-// Token returns the token by id
-func (c *Core) Token(ctx context.Context, tokenID string) (Token, error) {
+// Authenticate authenticates the token
+func (c *Core) Authenticate(ctx context.Context, tokenID string) (Token, error) {
 	token, err := c.tokenStore.Get(ctx, tokenID)
 	if err != nil {
 		return Token{}, fmt.Errorf("tokenStore.Get[%s]: %w", tokenID, err)
