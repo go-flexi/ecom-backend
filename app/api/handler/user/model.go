@@ -45,7 +45,7 @@ type User struct {
 	UpdatedAt time.Time  `json:"updated_at"`
 }
 
-func (u *User) fromCoreUser(cu user.User) {
+func (u *User) set(cu user.User) {
 	u.ID = cu.ID.String()
 	u.Name = cu.Name
 	u.Email = cu.Email.String()

@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -11,9 +10,18 @@ import (
 	"go.uber.org/zap"
 )
 
+// handlers is a set of HTTP handlers for user API.
 type handlers struct {
 	core   *user.Core
 	logger *zap.Logger
+}
+
+// NewHandlers returns a new handlers.
+func newHandlers(core *user.Core, logger *zap.Logger) *handlers {
+	return &handlers{
+		core:   core,
+		logger: logger,
+	}
 }
 
 func (h *handlers) create(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
@@ -29,13 +37,13 @@ func (h *handlers) create(ctx context.Context, w http.ResponseWriter, r *http.Re
 	}
 
 	createdUser, err := h.core.Create(ctx, coreUser)
-	if errors.Is(err, user.ErrUniqueEmail) {
-		return web.NewTrustedError(fmt.Errorf("email already is existed"), http.StatusBadRequest)
+	if err != nil {
+		return fmt.Errorf("core.Create: %w", web.AppErrToTrustedErr(err))
 	}
 
 	var response User
-	response.fromCoreUser(createdUser)
-	return web.JSONResponse(ctx, w, createdUser, http.StatusCreated)
+	response.set(createdUser)
+	return web.JSONResponse(ctx, w, response, http.StatusCreated)
 }
 
 func (h *handlers) list(ctx context.Context, w http.ResponseWriter, r *http.Request) error {

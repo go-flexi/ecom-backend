@@ -13,8 +13,7 @@ import (
 
 // list of errors
 var (
-	ErrNotFound    = errors.New("not found")
-	ErrUniqueEmail = errors.New("email already exists")
+	ErrNotFound = errors.New("not found")
 )
 
 const tokenDuration = time.Hour * 24
