@@ -3,7 +3,7 @@ package user
 // Filter represents a filter for querying users.
 type Filter struct {
 	Email   *string
-	Roles   []string
+	Name    *string
 	Enabled *bool
 }
 
@@ -18,9 +18,9 @@ func (f *Filter) WithEmail(email string) *Filter {
 	return f
 }
 
-// WithRoles adds a role filter to the filter.
-func (f *Filter) WithRoles(roles ...string) *Filter {
-	f.Roles = roles
+// WithName adds a name filter to the filter.
+func (f *Filter) WithName(name string) *Filter {
+	f.Name = &name
 	return f
 }
 

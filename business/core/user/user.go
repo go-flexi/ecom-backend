@@ -25,7 +25,7 @@ type Store interface {
 	Update(ctx context.Context, uu UpdateUser) error
 	ByID(context.Context, string) (User, error)
 	ByIDs(context.Context, []string) ([]User, error)
-	ByEmailNPassword(ctx context.Context, email, passwordHash string) (User, error)
+	ByEmailNPassword(ctx context.Context, email mail.Address, passwordHash string) (User, error)
 	Query(context.Context, Filter, filter.OrderBy, filter.Page) ([]User, error)
 }
 
@@ -51,7 +51,7 @@ func NewCore(store Store, tokenStore TokenStore) *Core {
 
 // Create creates a new user
 func (c *Core) Create(ctx context.Context, nu NewUser) (User, error) {
-	if err := createPermissionCheck(ctx, nu); err != nil {
+	if err := checkCreatePermission(ctx, nu); err != nil {
 		return User{}, fmt.Errorf("createPermissionCheck: %w", err)
 	}
 
@@ -68,7 +68,7 @@ func (c *Core) Create(ctx context.Context, nu NewUser) (User, error) {
 
 // ByID returns the User by id
 func (c *Core) ByID(ctx context.Context, userID string) (User, error) {
-	if errors := getPermissionCheck(ctx, userID); errors != nil {
+	if errors := checkGetPermission(ctx, userID); errors != nil {
 		return User{}, fmt.Errorf("gerPermissionCheck: %w", errors)
 	}
 
@@ -92,7 +92,7 @@ func (c *Core) ByIDs(ctx context.Context, userIDs []string) ([]User, error) {
 
 // Update updates the user
 func (c *Core) Update(ctx context.Context, uu UpdateUser) (User, error) {
-	if err := updatePermissionCheck(ctx, uu); err != nil {
+	if err := checkUpdatePermission(ctx, uu); err != nil {
 		return User{}, fmt.Errorf("updatePermissionCheck: %w", err)
 	}
 
@@ -110,6 +110,10 @@ func (c *Core) Update(ctx context.Context, uu UpdateUser) (User, error) {
 
 // Query returns the users based on the filter
 func (c *Core) Query(ctx context.Context, filter Filter, orderBy filter.OrderBy, page filter.Page) ([]User, error) {
+	if err := checkQueryPermission(ctx); err != nil {
+		return nil, fmt.Errorf("checkQueryPermission: %w", err)
+	}
+
 	users, err := c.store.Query(ctx, filter, orderBy, page)
 	if err != nil {
 		return nil, fmt.Errorf("store.Query: filter[%v]: orderBy[%v]: page[%v]: %w", filter, orderBy, page, err)
@@ -159,8 +163,16 @@ func (c *Core) Authenticate(ctx context.Context, tokenID string) (Token, error) 
 	return token, nil
 }
 
-// getPermissionCheck checks if the user has permission to get a user
-func getPermissionCheck(ctx context.Context, userID string) error {
+func checkQueryPermission(ctx context.Context) error {
+	token := GetContextToken(ctx)
+	if token.Roles.Contains(RoleAdmin()) || token.Roles.Contains(RoleManager()) {
+		return nil
+	}
+	return apperrors.NewAuthorization("user does not have permission to query users")
+}
+
+// checkGetPermission checks if the user has permission to get a user
+func checkGetPermission(ctx context.Context, userID string) error {
 	token := GetContextToken(ctx)
 	if token.Roles.Contains(RoleAdmin()) || token.Roles.Contains(RoleManager()) {
 		return nil
@@ -173,8 +185,8 @@ func getPermissionCheck(ctx context.Context, userID string) error {
 	return apperrors.NewAuthorization("user does not have permission to get other user")
 }
 
-// createPermissionCheck checks if the user has permission to create a user
-func createPermissionCheck(ctx context.Context, nu NewUser) error {
+// checkCreatePermission checks if the user has permission to create a user
+func checkCreatePermission(ctx context.Context, nu NewUser) error {
 	token := GetContextToken(ctx)
 	if nu.Roles.Contains(RoleAdmin()) || nu.Roles.Contains(RoleManager()) {
 		if !token.Roles.Contains(RoleAdmin()) {
@@ -184,36 +196,36 @@ func createPermissionCheck(ctx context.Context, nu NewUser) error {
 	return nil
 }
 
-// updatePermissionCheck checks if the user has permission to update a user
-func updatePermissionCheck(ctx context.Context, uu UpdateUser) error {
+// checkUpdatePermission checks if the user has permission to update a user
+func checkUpdatePermission(ctx context.Context, uu UpdateUser) error {
 	token := GetContextToken(ctx)
-	if err := passwordUpdatePermissionCheck(token, uu); err != nil {
+	if err := checkPasswordUpdatePermission(token, uu); err != nil {
 		return err
 	}
-	if err := roleUPdatePermissionCheck(token, uu); err != nil {
+	if err := checkRoleUPdatePermission(token, uu); err != nil {
 		return err
 	}
-	if err := enableUpdatePermissionCheck(token, uu); err != nil {
+	if err := checkEnableUpdatePermission(token, uu); err != nil {
 		return err
 	}
 	return nil
 }
 
-func enableUpdatePermissionCheck(token Token, uu UpdateUser) error {
+func checkEnableUpdatePermission(token Token, uu UpdateUser) error {
 	if token.Roles.Contains(RoleAdmin()) {
 		return nil
 	}
 	return apperrors.NewAuthorization("user does not have permission to update enabled")
 }
 
-func roleUPdatePermissionCheck(token Token, uu UpdateUser) error {
+func checkRoleUPdatePermission(token Token, uu UpdateUser) error {
 	if token.Roles.Contains(RoleAdmin()) {
 		return nil
 	}
 	return apperrors.NewAuthorization("user does not have permission to update roles")
 }
 
-func passwordUpdatePermissionCheck(token Token, uu UpdateUser) error {
+func checkPasswordUpdatePermission(token Token, uu UpdateUser) error {
 	if uu.Password == nil {
 		return nil
 	}

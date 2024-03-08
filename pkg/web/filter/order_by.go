@@ -12,7 +12,7 @@ import (
 
 // ParseOrderBy parses the OrderBy from the request.
 func ParseOrderBy(r *http.Request, defaultOrder filter.OrderBy) (filter.OrderBy, error) {
-	v := chi.URLParam(r, "orderBy")
+	v := chi.URLParam(r, "order_by")
 	if v == "" {
 		return defaultOrder, nil
 	}

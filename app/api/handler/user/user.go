@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-flexi/ecom-backend/business/core/user"
 	"github.com/go-flexi/ecom-backend/pkg/web"
+	"github.com/go-flexi/ecom-backend/pkg/web/filter"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -49,7 +50,34 @@ func (h *handlers) create(ctx context.Context, w http.ResponseWriter, r *http.Re
 }
 
 func (h *handlers) list(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	return nil
+	page, err := filter.ParsePage(r)
+	if err != nil {
+		return fmt.Errorf("parsePage: %w", web.AppErrToTrustedErr(err))
+	}
+
+	order, err := parseOrder(r)
+	if err != nil {
+		return fmt.Errorf("parseOrder: %w", web.AppErrToTrustedErr(err))
+	}
+
+	filter, err := parseFilter(r)
+	if err != nil {
+		return fmt.Errorf("parseFilter: %w", web.AppErrToTrustedErr(err))
+	}
+
+	users, err := h.core.Query(ctx, filter, order, page)
+	if err != nil {
+		return fmt.Errorf("core.Query: %w", web.AppErrToTrustedErr(err))
+	}
+
+	var response []User
+	for _, u := range users {
+		var user User
+		user.set(u)
+		response = append(response, user)
+	}
+
+	return web.JSONResponse(ctx, w, response, http.StatusOK)
 }
 
 func (h *handlers) get(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
