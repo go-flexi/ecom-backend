@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-flexi/ecom-backend/business/core/user"
+	"github.com/google/uuid"
 )
 
 // NewUser represents a new user request
@@ -15,7 +16,7 @@ type NewUser struct {
 	Roles    []string `json:"roles"`
 }
 
-func (nu NewUser) coreNewUser() (user.NewUser, error) {
+func (nu NewUser) toCoreNewUser() (user.NewUser, error) {
 	email, err := mail.ParseAddress(nu.Email)
 	if err != nil {
 		return user.NewUser{}, err
@@ -53,4 +54,48 @@ func (u *User) set(cu user.User) {
 	u.Enabled = cu.Enabled
 	u.CreatedAt = cu.CreatedAt
 	u.UpdatedAt = cu.UpdatedAt
+}
+
+// UpdateUser represents a user update request
+type UpdateUser struct {
+	ID       string   `json:"-"`
+	Name     *string  `json:"name,omitempty"`
+	Roles    []string `json:"roles,omitempty"`
+	Password *string  `json:"password,omitempty"`
+	Enabled  *bool    `json:"enabled,omitempty"`
+}
+
+// coreUpdateUser converts the update user request to core update user
+func (uu *UpdateUser) toCoreUpdateUser(userID uuid.UUID) (user.UpdateUser, error) {
+	var roles user.Roles
+	var err error
+
+	if uu.Roles != nil {
+		roles, err = user.ParseRoles(uu.Roles)
+		return user.UpdateUser{}, err
+	}
+
+	var password *user.Password
+	if uu.Password != nil {
+		convertedPass := user.Password(*uu.Password)
+		password = &convertedPass
+	}
+
+	return user.UpdateUser{
+		ID:       userID,
+		Name:     uu.Name,
+		Roles:    roles,
+		Password: password,
+		Enabled:  uu.Enabled,
+	}, nil
+}
+
+// Token represents a user token
+type Token struct {
+	Token string `json:"token"`
+}
+
+// set sets the token
+func (t *Token) set(token user.Token) {
+	t.Token = token.ID.String()
 }

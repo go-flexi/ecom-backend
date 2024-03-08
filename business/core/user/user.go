@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/mail"
 	"time"
 
 	"github.com/go-flexi/ecom-backend/pkg/apperrors"
@@ -67,7 +68,7 @@ func (c *Core) Create(ctx context.Context, nu NewUser) (User, error) {
 
 // ByID returns the User by id
 func (c *Core) ByID(ctx context.Context, userID string) (User, error) {
-	if errors := gerPermissionCheck(ctx, userID); errors != nil {
+	if errors := getPermissionCheck(ctx, userID); errors != nil {
 		return User{}, fmt.Errorf("gerPermissionCheck: %w", errors)
 	}
 
@@ -117,8 +118,8 @@ func (c *Core) Query(ctx context.Context, filter Filter, orderBy filter.OrderBy,
 	return users, nil
 }
 
-// ByEmailNPassword returns the user by email and password
-func (c *Core) ByEmailNPassword(ctx context.Context, email, password string) (User, error) {
+// byEmailNPassword returns the user by email and password
+func (c *Core) byEmailNPassword(ctx context.Context, email mail.Address, password string) (User, error) {
 	user, err := c.store.ByEmailNPassword(ctx, email, password)
 	if err != nil {
 		return User{}, fmt.Errorf("store.ByEmailNPassword: %w", err)
@@ -128,8 +129,8 @@ func (c *Core) ByEmailNPassword(ctx context.Context, email, password string) (Us
 }
 
 // GenerateToken generates a token for the user
-func (c *Core) GenerateToken(ctx context.Context, email, password string) (Token, error) {
-	user, err := c.ByEmailNPassword(ctx, email, password)
+func (c *Core) GenerateToken(ctx context.Context, email mail.Address, password string) (Token, error) {
+	user, err := c.byEmailNPassword(ctx, email, password)
 	if err != nil {
 		return Token{}, fmt.Errorf("ByEmailNPassword: %w", err)
 	}
@@ -158,8 +159,8 @@ func (c *Core) Authenticate(ctx context.Context, tokenID string) (Token, error) 
 	return token, nil
 }
 
-// gerPermissionCheck checks if the user has permission to get a user
-func gerPermissionCheck(ctx context.Context, userID string) error {
+// getPermissionCheck checks if the user has permission to get a user
+func getPermissionCheck(ctx context.Context, userID string) error {
 	token := GetContextToken(ctx)
 	if token.Roles.Contains(RoleAdmin()) || token.Roles.Contains(RoleManager()) {
 		return nil

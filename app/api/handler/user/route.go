@@ -19,7 +19,7 @@ func Route(
 	middlwares := []server.Middleware{middlewareRegistry.Logger, middlewareRegistry.Panic}
 
 	routes = append(routes, server.Route{Method: "POST", Path: "/api/v1/users", Handler: h.create, Middlewares: middlwares})
-	routes = append(routes, server.Route{Method: "POST", Path: "/api/v1/users/token", Handler: h.create, Middlewares: middlwares})
+	routes = append(routes, server.Route{Method: "POST", Path: "/api/v1/users/token", Handler: h.token, Middlewares: middlwares})
 
 	authMiddlewares := append(middlwares, middlewareRegistry.Auth)
 
