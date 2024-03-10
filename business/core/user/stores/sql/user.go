@@ -29,8 +29,10 @@ func NewStore(db *sqlx.DB, logger *zap.Logger) *Store {
 func (s *Store) Create(ctx context.Context, user user.User) error {
 	dbUser := toDBUser(user)
 	query := `
-		insert into users (id, name, email, password_hash, roles, enabled, created_at, updated_at)
-		values (:id, :name, :email, :password_hash, :roles, :enabled, :created_at, :updated_at)
+	insert into users 
+		(id, name, email, password_hash, roles, enabled, created_at, updated_at)
+	values 
+		(:id, :name, :email, :password_hash, :roles, :enabled, :created_at, :updated_at)
 	`
 	if _, err := s.db.NamedExecContext(ctx, query, dbUser); err != nil {
 		return fmt.Errorf("db.NamedExecContext[%s]: %w", query, err)
@@ -48,16 +50,16 @@ func (s *Store) Update(ctx context.Context, uu user.UpdateUser) error {
 	buf.WriteString(`update users set `)
 	buf.WriteString(`"updated_at" = :updated_at`)
 	if dbUser.Name != nil {
-		buf.WriteString(`"name" = :name,`)
+		buf.WriteString(`",name" = :name`)
 	}
 	if dbUser.Roles != "" {
-		buf.WriteString(`"roles" = :roles,`)
+		buf.WriteString(`",roles" = :roles`)
 	}
 	if dbUser.Password != nil {
-		buf.WriteString(`"password_hash" = :password,`)
+		buf.WriteString(`",password_hash" = :password`)
 	}
 	if dbUser.Enabled != nil {
-		buf.WriteString(`"enabled" = :enabled,`)
+		buf.WriteString(`",enabled" = :enabled`)
 	}
 	buf.WriteString(` where "id" = :id`)
 
