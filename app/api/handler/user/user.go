@@ -41,7 +41,7 @@ func (h *handlers) create(ctx context.Context, w http.ResponseWriter, r *http.Re
 
 	createdUser, err := h.core.Create(ctx, coreUser)
 	if err != nil {
-		return fmt.Errorf("core.Create: %w", web.AppErrToTrustedErr(err))
+		return fmt.Errorf("core.Create: %w", err)
 	}
 
 	var response User
@@ -52,22 +52,22 @@ func (h *handlers) create(ctx context.Context, w http.ResponseWriter, r *http.Re
 func (h *handlers) list(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	page, err := filter.ParsePage(r)
 	if err != nil {
-		return fmt.Errorf("parsePage: %w", web.AppErrToTrustedErr(err))
+		return fmt.Errorf("parsePage: %w", err)
 	}
 
 	order, err := parseOrder(r)
 	if err != nil {
-		return fmt.Errorf("parseOrder: %w", web.AppErrToTrustedErr(err))
+		return fmt.Errorf("parseOrder: %w", err)
 	}
 
 	filter, err := parseFilter(r)
 	if err != nil {
-		return fmt.Errorf("parseFilter: %w", web.AppErrToTrustedErr(err))
+		return fmt.Errorf("parseFilter: %w", err)
 	}
 
 	users, err := h.core.Query(ctx, filter, order, page)
 	if err != nil {
-		return fmt.Errorf("core.Query: %w", web.AppErrToTrustedErr(err))
+		return fmt.Errorf("core.Query: %w", err)
 	}
 
 	var response []User
@@ -87,7 +87,7 @@ func (h *handlers) get(ctx context.Context, w http.ResponseWriter, r *http.Reque
 		return web.NewTrustedError(fmt.Errorf("user not found by id %s", id), http.StatusNotFound)
 	}
 	if err != nil {
-		return fmt.Errorf("core.ByID[%s]: %w", id, web.AppErrToTrustedErr(err))
+		return fmt.Errorf("core.ByID[%s]: %w", id, err)
 	}
 
 	var response User
@@ -117,7 +117,7 @@ func (h *handlers) update(ctx context.Context, w http.ResponseWriter, r *http.Re
 		return web.NewTrustedError(fmt.Errorf("user not found by id %s", id), http.StatusNotFound)
 	}
 	if err != nil {
-		return fmt.Errorf("core.Update: %w", web.AppErrToTrustedErr(err))
+		return fmt.Errorf("core.Update: %w", err)
 	}
 
 	var response User
@@ -141,7 +141,7 @@ func (h *handlers) token(ctx context.Context, w http.ResponseWriter, r *http.Req
 		if errors.Is(err, user.ErrNotFound) {
 			return web.NewTrustedError(fmt.Errorf("user not found by email %s and password", email), http.StatusNotFound)
 		}
-		return fmt.Errorf("core.GenerateToken: %w", web.AppErrToTrustedErr(err))
+		return fmt.Errorf("core.GenerateToken: %w", err)
 	}
 
 	var token Token

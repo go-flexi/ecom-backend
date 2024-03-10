@@ -17,8 +17,12 @@ func (ae Authorization) Error() string {
 	return ae.reason
 }
 
-// IsAuthorization checks if an error is a Authorization error
-func IsAuthorization(err error) bool {
+// ToAuthorization returns the underlying error of a Authorization error
+// returns true if the error is a Authorization error
+func ToAuthorization(err error) (error, bool) {
 	var a Authorization
-	return errors.As(err, &a)
+	if errors.As(err, &a) {
+		return a, true
+	}
+	return err, false
 }

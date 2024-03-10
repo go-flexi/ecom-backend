@@ -34,8 +34,12 @@ func (fe FieldErrors) Error() string {
 	return string(b)
 }
 
-// IsFieldErrors checks if an error is a FieldErrors
-func IsFieldErrors(err error) bool {
+// ToFieldErrors returns the underlying error of a FieldErrors
+// returns true if the error is a FieldErrors
+func ToFieldErrors(err error) (FieldErrors, bool) {
 	var fe FieldErrors
-	return errors.As(err, &fe)
+	if errors.As(err, &fe) {
+		return fe, true
+	}
+	return nil, false
 }

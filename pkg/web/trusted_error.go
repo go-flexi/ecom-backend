@@ -21,8 +21,12 @@ func (te TrustedError) Error() string {
 	return te.Err.Error()
 }
 
-// IsTrustedError checks if an error is a TrustedError
-func IsTrustedError(err error) bool {
+// ToTrustedError returns the underlying error of a TrustedError
+// returns true if the error is a TrustedError
+func ToTrustedError(err error) (TrustedError, bool) {
 	var te TrustedError
-	return errors.As(err, &te)
+	if errors.As(err, &te) {
+		return te, true
+	}
+	return TrustedError{}, false
 }

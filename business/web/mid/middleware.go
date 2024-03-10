@@ -7,4 +7,5 @@ type Middlewares struct {
 	Auth   server.Middleware
 	Logger server.Middleware
 	Panic  server.Middleware
+	Errors server.Middleware
 }

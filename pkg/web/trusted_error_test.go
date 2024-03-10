@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestIsTrustedError(t *testing.T) {
+func TestToTrustedError(t *testing.T) {
 	testTable := map[string]struct {
 		err    error
 		result bool
@@ -26,8 +26,8 @@ func TestIsTrustedError(t *testing.T) {
 
 	for name, tt := range testTable {
 		t.Run(name, func(t *testing.T) {
-			if result := IsTrustedError(tt.err); result != tt.result {
-				t.Errorf("expected %v but got %v", tt.result, result)
+			if _, ok := ToTrustedError(tt.err); ok != tt.result {
+				t.Errorf("expected %v but got %v", tt.result, ok)
 			}
 		})
 	}

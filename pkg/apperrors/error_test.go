@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestIsFieldErrors(t *testing.T) {
+func TestToFieldErrors(t *testing.T) {
 	testTable := map[string]struct {
 		err      error
 		expected bool
@@ -31,9 +31,9 @@ func TestIsFieldErrors(t *testing.T) {
 
 	for tn, tc := range testTable {
 		t.Run(tn, func(t *testing.T) {
-			actual := IsFieldErrors(tc.err)
-			if actual != tc.expected {
-				t.Errorf("expected %v; got %v", tc.expected, actual)
+			_, ok := ToFieldErrors(tc.err)
+			if ok != tc.expected {
+				t.Errorf("expected %v; got %v", tc.expected, ok)
 			}
 		})
 	}
