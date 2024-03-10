@@ -36,7 +36,7 @@ func (h *handlers) create(ctx context.Context, w http.ResponseWriter, r *http.Re
 
 	coreUser, err := newUser.toCoreNewUser()
 	if err != nil {
-		return web.NewTrustedError(fmt.Errorf("toCoreNewUser: %w", err), http.StatusBadRequest)
+		return web.NewTrustedError(err, http.StatusBadRequest)
 	}
 
 	createdUser, err := h.core.Create(ctx, coreUser)
@@ -109,7 +109,7 @@ func (h *handlers) update(ctx context.Context, w http.ResponseWriter, r *http.Re
 
 	coreUpdateUser, err := updateUser.toCoreUpdateUser(userID)
 	if err != nil {
-		return web.NewTrustedError(fmt.Errorf("toCoreUpdateUser: %w", err), http.StatusBadRequest)
+		return web.NewTrustedError(err, http.StatusBadRequest)
 	}
 
 	updatedUser, err := h.core.Update(ctx, coreUpdateUser)
